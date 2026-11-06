@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src https://cstjkksgxyylpjgawqgo.supabase.co; base-uri 'none'; form-action 'none'">
+  <title>Verify your email · DARE.</title>
+  <script src="verify.js" defer></script>
+  <link rel="stylesheet" href="verify.css">
+</head>
+<body>
+  <main>
+    <p class="brand">DARE<span>.</span></p>
+    <div id="result" role="status">
+      <div id="checkmark" aria-hidden="true" hidden>✓</div>
+      <h1 id="heading">Verify your email</h1>
+      <p id="message">Open the link in your DARE. Staging confirmation email with JavaScript enabled to continue.</p>
+    </div>
+    <button id="confirm" type="button" hidden>Verify email</button>
+    <a id="open-app" href="dare-staging://home" hidden>Open DARE.</a>
+    <p id="fallback" hidden>If the button doesn’t open the app, open DARE Staging manually and sign in with your email and password.</p>
+  </main>
+</body>
+</html>
