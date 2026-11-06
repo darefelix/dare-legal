@@ -8,5 +8,5 @@ main { width: min(100%, 32rem); padding: clamp(1.5rem, 6vw, 3rem); border: 1px s
 #checkmark { display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%; background: #243115; font-size: 1.75rem; }
 h1 { line-height: 1.05; letter-spacing: -.045em; font-size: clamp(2rem, 8vw, 3rem); }
 p { color: #bec8bb; }
-button, a { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: .65rem 1rem; border: 0; border-radius: .65rem; background: #c6ff4f; color: #11150d; font: inherit; font-weight: 800; text-decoration: none; cursor: pointer; }
+a { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: .65rem 1rem; border: 0; border-radius: .65rem; background: #c6ff4f; color: #11150d; font: inherit; font-weight: 800; text-decoration: none; cursor: pointer; }
 :focus-visible { outline: 2px solid white; outline-offset: .25rem; }

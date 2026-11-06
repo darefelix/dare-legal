@@ -1,73 +1,32 @@
 "use strict";
 
 (() => {
-  const endpoint = "https://cstjkksgxyylpjgawqgo.supabase.co/auth/v1/verify";
-  const apiKey = "sb_publishable_3ih9KsQYx0GjlKz0cAX_yg_F9DUj8IM";
-  const confirm = document.getElementById("confirm");
-  const openApp = document.getElementById("open-app");
-  const fallback = document.getElementById("fallback");
   const show = (heading, message) => {
     document.getElementById("heading").textContent = heading;
     document.getElementById("message").textContent = message;
   };
 
-  let token = null;
+  let query, fragment;
   try {
-    const fragment = location.hash;
-    if (fragment || location.search) history.replaceState(null, "", location.pathname);
-    // Accept exactly one opaque signup hash. Never forward arbitrary URL parameters.
-    if (!fragment.startsWith("#token_hash=")) throw new Error();
-    const match = /^#token_hash=([A-Za-z0-9_-]{32,256})$/.exec(fragment);
-    if (match) token = match[1];
+    query = new URLSearchParams(location.search);
+    fragment = new URLSearchParams(location.hash.slice(1));
+    if (location.search || location.hash) history.replaceState(null, "", location.pathname);
   } catch {
-    // Do not proceed if the credential cannot be removed from the URL.
-  }
-
-  const invalid = () => show(
-    "This link can’t be used",
-    "It may be incomplete, invalid, expired, or already used. If you already verified your email, open DARE Staging and sign in. Otherwise, open your latest confirmation email or contact support."
-  );
-  openApp.hidden = false;
-  fallback.hidden = false;
-  if (token === null) {
-    invalid();
+    show("Continue in DARE.", "Open DARE Staging and sign in to check your account.");
     return;
   }
 
-  show("Verify your email", "Confirm your email address to finish setting up your DARE. Staging account.");
-  confirm.hidden = false;
-  openApp.hidden = true;
-  fallback.hidden = true;
-  confirm.addEventListener("click", async () => {
-    if (token === null) return;
-    const body = JSON.stringify({ token_hash: token, type: "email" });
-    token = null;
-    confirm.hidden = true;
-    show("Verifying your email…", "Please wait while we confirm your address.");
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 12_000);
-    try {
-      const response = await fetch(endpoint, {
-        method: "POST", headers: { "Content-Type": "application/json", apikey: apiKey },
-        body, signal: controller.signal, credentials: "omit", cache: "no-store",
-        referrerPolicy: "no-referrer", redirect: "error"
-      });
-      // Supabase may return a session. Discard the body; never log, persist, or forward it.
-      response.body?.cancel().catch(() => {});
-      if (response.status === 200) {
-        document.getElementById("checkmark").hidden = false;
-        show("Email verified successfully", "You're ready to take the next step.");
-      } else if ([400, 401, 403, 422].includes(response.status)) {
-        invalid();
-      } else {
-        throw new Error();
-      }
-    } catch {
-      show("We couldn’t confirm the result", "Check your connection and try signing in. If your address still isn’t confirmed, reopen the original email link or contact support.");
-    } finally {
-      clearTimeout(timer);
-      openApp.hidden = false;
-      fallback.hidden = false;
-    }
-  });
+  const hasError = (params) => ["error", "error_code", "error_description"].some((key) => params.has(key));
+  if (hasError(query) || hasError(fragment)) {
+    show("This link can’t be used", "It may be expired, invalid, or already used. If you already verified your email, sign in. Otherwise, use the latest confirmation email or contact support.");
+    return;
+  }
+
+  // A PKCE code is a browser navigation hint, never proof of account ownership.
+  // Do not redeem it, forward it, or use it to establish a session.
+  const codes = query.getAll("code");
+  if (fragment.size === 0 && codes.length === 1 && /^[A-Za-z0-9_-]{16,256}$/.test(codes[0])) {
+    document.getElementById("checkmark").hidden = false;
+    show("Continue in DARE.", "You're ready to take the next step. Open DARE Staging and sign in to finish.");
+  }
 })();
